@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secure Access Terminal</title>
+
+<style>
+:root {
+    --main-color: #00ff00;
+    --bg: black;
+}
+
+body {
+    margin: 0;
+    font-family: "Courier New", monospace;
+    background: var(--bg);
+    color: var(--main-color);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* LOGIN PANEL */
+#login {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.panel {
+    border: 2px solid var(--main-color);
+    padding: 25px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 20px var(--main-color);
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: black;
+    color: var(--main-color);
+    border: 1px solid var(--main-color);
+}
+
+button:hover {
+    background: var(--main-color);
+    color: black;
+    cursor: pointer;
+}
+
+/* MATRIX */
+canvas {
+    position: fixed;
+    inset: 0;
+    display: none;
+}
+
+/* TERMINAL */
+#terminal {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 14px;
+    white-space: pre-line;
+    display: none;
+}
+
+/* COUNTDOWN */
+#countdown {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 28px;
+    display: none;
+}
+
+/* FINAL MESSAGE */
+#birthday {
+    display: none;
+    position: absolute;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: red;
+    animation: glitch 0.4s infinite, shake 0.15s infinite;
+}
+
+/* GLITCH */
+@keyframes glitch {
+    0% { text-shadow: 3px 3px red; }
+    20% { text-shadow: -3px 2px lime; }
+    40% { text-shadow: 2px -2px cyan; }
+    60% { text-shadow: -2px -2px red; }
+    80% { text-shadow: 2px 2px lime; }
+    100% { text-shadow: 0 0 10px cyan; }
+}
+
+/* SHAKE */
+@keyframes shake {
+    0% { transform: translate(0); }
+    25% { transform: translate(3px, -3px); }
+    50% { transform: translate(-3px, 3px); }
+    75% { transform: translate(3px, 3px); }
+    100% { transform: translate(0); }
+}
+
+/* FLASH */
+.flash {
+    animation: flash 0.2s infinite;
+}
+
+@keyframes flash {
+    0% { background: black; }
+    50% { background: darkred; }
+    100% { background: black; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="login">
+    <div class="panel">
+        <h3>SECURE ACCESS TERMINAL</h3>
+        <input type="text" placeholder="Institution Name">
+        <input type="password" placeholder="Access Key">
+        <button onclick="startHack()">INITIALIZE</button>
+
+        <p style="font-size:10px;">⚠ SYSTEM MONITORED</p>
+
+        <label style="font-size:12px;">
+            <input type="checkbox" checked onchange="toggleTheme(this)">
+            Green Hacker Mode
+        </label>
+    </div>
+</div>
+
+<canvas id="matrix"></canvas>
+
+<div id="terminal"></div>
+<div id="countdown">6</div>
+
+<div id="birthday">
+    ⚠ YOU HAVE BEEN HACKED ⚠<br>
+    CYBER CRYPT0KN1GHT
+</div>
+
+<audio id="alarm" loop>
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3">
+</audio>
+
+<script>
+function toggleTheme(box) {
+    document.documentElement.style.setProperty(
+        '--main-color',
+        box.checked ? '#00ff00' : '#00bfff'
+    );
+}
+
+function startHack() {
+    document.getElementById("login").style.display = "none";
+
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.style.display = "block";
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+        ctx.fillStyle = "rgba(0,0,0,0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = getComputedStyle(document.documentElement)
+            .getPropertyValue('--main-color');
+
+        ctx.font = fontSize + "px monospace";
+
+        for (let i = 0; i < drops.length; i++) {
+            const char = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.97)
+                drops[i] = 0;
+            drops[i]++;
+        }
+    }
+
+    const matrixLoop = setInterval(drawMatrix, 40);
+
+    const terminal = document.getElementById("terminal");
+    terminal.style.display = "block";
+
+    const commands = [
+        "Initializing breach protocol...",
+        "Injecting payload...",
+        "Access level: ROOT",
+        "Firewall compromised...",
+        "User identified: CYBER CRYPT0KN1GHT",
+        "Deploying final sequence..."
+    ];
+
+    let i = 0, j = 0;
+    const typer = setInterval(() => {
+        if (i < commands.length) {
+            if (j < commands[i].length) {
+                terminal.innerHTML += commands[i][j];
+                j++;
+            } else {
+                terminal.innerHTML += "\n";
+                i++;
+                j = 0;
+            }
+        }
+    }, 40);
+
+    let time = 6;
+    const countdown = document.getElementById("countdown");
+    countdown.style.display = "block";
+    countdown.innerText = time;
+
+    const timer = setInterval(() => {
+        time--;
+        countdown.innerText = time;
+
+        if (time === 0) {
+            clearInterval(timer);
+            clearInterval(typer);
+            clearInterval(matrixLoop);
+
+            document.body.classList.add("flash");
+            document.getElementById("alarm").play();
+
+            canvas.style.display = "none";
+            terminal.style.display = "none";
+            countdown.style.display = "none";
+
+            document.getElementById("birthday").style.display = "flex";
+        }
+    }, 1000);
+}
+</script>
+
+</body>
+</html>
